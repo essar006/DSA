@@ -1,52 +1,43 @@
 class Solution {
 public:
-    bool isValid(int x, int y, int m, int n) {
-        return (x >= 0 && x < m && y >= 0 && y < n);
-    }
+    vector<pair<int, int>> dirs = {{-1,-1}, {-1,0}, {-1,1}, {1,0}, {1,1}, {1, -1}, {0, -1}, {0,1}};
+    int n;
+    vector<vector<int>> vis;
 
     int shortestPathBinaryMatrix(vector<vector<int>>& grid) {
-        int m = grid.size();
-        int n = grid[0].size();
-        
-        if (grid[0][0] == 1 || grid[m-1][n-1] == 1) {
-            return -1;
-        }
-        
-        vector<vector<int>> visited(m, vector<int>(n, -1));
-        visited[0][0] = 1; 
-        
-        queue<pair<int, int>> q;
+        if(grid.empty()) return -1;
+
+        n = grid.size();
+
+        if(grid[0][0] == 1 || grid[n-1][n-1] == 1) return -1;
+        vis = vector<vector<int>>(n, vector<int>(n, -1));
+        vis[0][0] = 1;
+
+        queue<pair<int,int>> q;
         q.push({0, 0});
-        
-        // 8 directions: horizontal, vertical, and diagonal
-        vector<pair<int, int>> directions = {
-            {-1, -1}, {-1, 0}, {-1, 1},
-            {0, -1},           {0, 1},
-            {1, -1},  {1, 0},  {1, 1}
-        };
-        
+
         while (!q.empty()) {
-            int i = q.front().first;
-            int j = q.front().second;
+            auto [x, y] = q.front();
             q.pop();
-            
-            // If we've reached the destination
-            if (i == m-1 && j == n-1) {
-                return visited[i][j];
-            }
-            
-            // Check all 8 directions
-            for (auto& dir : directions) {
-                int ni = i + dir.first;
-                int nj = j + dir.second;
+
+            if(x == n-1 && y == n-1)
+                return vis[x][y];
+
+            for (auto &dir : dirs) {
+                int row = x + dir.first;
+                int col = y + dir.second;
                 
-                if (isValid(ni, nj, m, n) && grid[ni][nj] == 0 && visited[ni][nj] == -1) {
-                    visited[ni][nj] = visited[i][j] + 1;
-                    q.push({ni, nj});
+                if (row >= 0 && row < n &&
+                    col >= 0 && col < n &&
+                    vis[row][col] == -1 &&
+                    grid[row][col] == 0) 
+                {
+                    vis[row][col] = vis[x][y] + 1;
+                    q.push({row, col});
+                    
                 }
             }
         }
-        
-        return -1; // No path found
+        return -1;
     }
 };
