@@ -1,35 +1,32 @@
 class Solution {
 public:
-    vector<pair<int, int>> dir{{0,1}, {0, -1}, {-1, 0}, {1,0}};
-    vector<vector<bool>> vis;
+    vector<vector<int>> dirs{{0,1}, {0,-1}, {1,0}, {-1,0}};
 
-    int dfs(int row, int col, int m, int n, vector<vector<int>> &grid){
-        if(row<0 || col <0 || row >=m || col >= n || vis[row][col] || grid[row][col] == 0)
+    int dfs(int r, int c, vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+
+        if (r < 0 || c < 0 || r >= m || c >= n || grid[r][c] == 0)
             return 0;
-        vis[row][col] = true;
-        int curArea = 1;
-        for(auto &d : dir){
-            int nx = row + d.first;
-            int ny = col + d.second;
-            if(nx>=0 && nx<m && ny>=0 && ny<n && grid[nx][ny] == 1)
-                curArea += dfs(nx, ny, m, n, grid);
+
+        grid[r][c] = 0; 
+
+        int area = 1;   
+
+        for (auto &d : dirs) {
+            area += dfs(r + d[0], c + d[1], grid);
         }
-        return curArea;
+
+        return area;
     }
 
     int maxAreaOfIsland(vector<vector<int>>& grid) {
-        int m = grid.size();
-        int n = grid[0].size();
-
-        vis = vector<vector<bool>>(m, vector<bool>(n, false));
+        int m = grid.size(), n = grid[0].size();
         int maxArea = 0;
 
-        for(int i=0; i<m; i++){
-            for(int j=0; j<n; j++){
-                if(vis[i][j] == false && grid[i][j] == 1)
-                {
-                    int currArea = dfs(i, j, m, n, grid);
-                    maxArea = max(maxArea, currArea);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) {
+                    maxArea = max(maxArea, dfs(i, j, grid));
                 }
             }
         }
