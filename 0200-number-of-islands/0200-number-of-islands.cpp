@@ -1,27 +1,29 @@
 class Solution {
 public:
-    void dfs(vector<vector<char>>& grid, int row, int col) {
-        if (row < 0 || col < 0 || row >= grid.size() || col >= grid[0].size() || grid[row][col] == '0') {
-            return;
+    vector<vector<bool>> vis;
+    vector<pair<int, int>> dir{{0,1}, {0, -1}, {-1, 0}, {1,0}};
+
+    void dfs (int row, int col, int m, int n, vector<vector<char>>& grid){
+        vis[row][col] = true; 
+        for(auto x : dir){
+            auto r = x.first + row;
+            auto c = x.second + col;
+            if(r>=0 && r<m && c>=0 && c<n && vis[r][c] == false && grid[r][c] == '1')
+                dfs(r, c, m, n, grid);
         }
-        grid[row][col] = '0'; 
-        dfs(grid, row + 1, col);
-        dfs(grid, row - 1, col);
-        dfs(grid, row, col + 1);
-        dfs(grid, row, col - 1);
     }
 
     int numIslands(vector<vector<char>>& grid) {
-        if (grid.empty()) return 0;
+        int m = grid.size();
+        int n = grid[0].size();
         int count = 0;
-        int rows = grid.size();
-        int cols = grid[0].size();
 
-        for (int i = 0; i < rows; ++i) {
-            for (int j = 0; j < cols; ++j) {
-                if (grid[i][j] == '1') {
-                    ++count;
-                    dfs(grid, i, j);
+        vis = vector<vector<bool>>(m, vector<bool>(n, false));
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n;j++){
+                if(grid[i][j] == '1' && vis[i][j] == false){
+                    dfs(i, j, m, n, grid);
+                    count++;
                 }
             }
         }
