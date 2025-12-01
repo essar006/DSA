@@ -1,33 +1,29 @@
 class Solution {
 public:
-    vector<int> visited;
-    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<vector<int>> adj(numCourses);
-        visited = vector<int>(numCourses, 0);
-        for(auto pre : prerequisites){
+    bool canFinish(int n, vector<vector<int>>& pres) {
+        vector<vector<int>> adj(n);
+        queue<int> q;
+        vector<int> in(n, 0);
+        int count = 0;
+        for(auto& pre : pres){
             adj[pre[1]].push_back(pre[0]);
+            in[pre[0]]++;
         }
 
-        for(int i=0; i<numCourses; i++){
-            if(visited[i] == 0){
-                if(dfs(i, adj)) return false;
+        for(int i=0; i<n; i++){
+            if(in[i] == 0) q.push(i);
+        }
+
+        while(!q.empty()){
+            int curr = q.front();
+            q.pop();
+            count++;
+
+            for(auto& nei : adj[curr]){
+                in[nei]--;
+                if(in[nei] == 0) q.push(nei);
             }
         }
-        return true;
+        return count == n;
     }
-
-    bool dfs(int node, vector<vector<int>>& adj)
-    {
-        visited[node] = 1;
-
-        for(auto nei : adj[node]){
-            if(visited[nei] == 0){
-                if(dfs(nei, adj)) return true;
-            }
-            if(visited[nei] == 1)
-                return true;
-        }
-        visited[node] = 2;
-        return false;
-    }
-};  
+};
