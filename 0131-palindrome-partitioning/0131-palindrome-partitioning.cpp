@@ -1,35 +1,33 @@
 class Solution {
 public:
     vector<vector<string>> res;
-    vector<string> v;
-    bool isPalindrome(string &pal){
-        int n = pal.size();
-        for(int i=0; i<n/2; i++){
-            if(pal[i] != pal[n-1-i])
+    bool isPal(string myStr){
+        int n = myStr.size();
+        for(int i=0; i<n; i++){
+            if(myStr[i] != myStr[n-1-i])
                 return false;
         }
         return true;
     }
 
-    void solve(const string &s, int start){
-        //base condition
-        if(start == s.size()){
-            res.push_back(v);
+    void dfs(string s, vector<string>& vs, int idx){
+        if(idx == s.size()){
+            res.push_back(vs);
             return;
         }
-        
-        for(int i = start; i<s.size(); i++){
-            string substrr = s.substr(start, i-start+1);
-            if(isPalindrome(substrr)){
-                v.push_back(substrr);
-                solve(s, i+1);
-                v.pop_back();
+
+        for(int i=idx; i<s.size(); i++){
+            string substrr = s.substr(idx, i-idx+1);
+            if(isPal(substrr)){
+                vs.push_back(substrr);
+                dfs(s, vs, i+1);
+                vs.pop_back();
             }
         }
     }
-
     vector<vector<string>> partition(string s) {
-        solve(s, 0);
+        vector<string> vs;
+        dfs(s, vs, 0);
         return res;
     }
 };
