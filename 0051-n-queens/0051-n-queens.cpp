@@ -2,51 +2,58 @@ class Solution {
 public:
     vector<vector<string>> res;
     vector<string> v;
-    vector<vector<int>> grid; 
-    vector<vector<string>> solveNQueens(int n) {
-        grid = vector<vector<int>>(n, vector<int>(n, 0));
-        dfs(n, 0); 
 
+    vector<int> rowUsed;
+    vector<int> diag1;
+    vector<int> diag2;
+
+    vector<vector<string>> solveNQueens(int n) {
+        rowUsed = vector<int>(n, 0);
+        diag1   = vector<int>(2*n - 1, 0);
+        diag2   = vector<int>(2*n - 1, 0);
+
+        dfs(n, 0);
         return res;
     }
 
-    void dfs(int n, int idx){
-        if(idx == n){
+    void dfs(int n, int col) {
+        if (col == n) {
             res.push_back(v);
             return;
         }
 
-        for(int i=0; i<n; i++){
-            if(canPut(i, idx, n)){
-                grid[i][idx] = 1;
-                v.push_back(getStr(n, i));
-                dfs(n, idx+1);
+        for (int row = 0; row < n; row++) {
+
+            if (canPut(row, col, n)) {
+                // mark used
+                rowUsed[row] = 1;
+                diag1[row + col] = 1;
+                diag2[row - col + (n - 1)] = 1;
+
+                v.push_back(getStr(n, row));
+
+                dfs(n, col + 1);
+
+                // backtrack
                 v.pop_back();
-                grid[i][idx] = 0;
+                rowUsed[row] = 0;
+                diag1[row + col] = 0;
+                diag2[row - col + (n - 1)] = 0;
             }
         }
     }
 
-    bool canPut(int row, int col, int n){ // <sabya.sachi>
-        for(int i=0; i<col; i++){   //same row (left)
-            if(grid[row][i] == 1)
-                return false;
-        }
-
-        for(int i = row+1, j = col-1; i < n && j >=0; i++, j--) { //lower left dia
-            if(grid[i][j] == 1) return false; 
-        }
-
-        for(int i = row-1, j = col-1; i >= 0 && j >=0; i--, j--) { //upper left dia
-            if(grid[i][j] == 1) return false; 
-        }
+    bool canPut(int row, int col, int n) {
+        if (rowUsed[row]) return false;
+        if (diag1[row + col]) return false;
+        if (diag2[row - col + (n - 1)]) return false;
 
         return true;
     }
 
-    string getStr(int n, int col){
+    string getStr(int n, int row) {
         string s(n, '.');
-        s[col] = 'Q';
+        s[row] = 'Q';
         return s;
     }
 };
