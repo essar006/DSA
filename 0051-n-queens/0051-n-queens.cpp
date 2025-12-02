@@ -1,56 +1,52 @@
 class Solution {
 public:
+    vector<vector<string>> res;
+    vector<string> v;
+    vector<vector<int>> grid; 
     vector<vector<string>> solveNQueens(int n) {
-        vector<vector<string>> res;
-        vector<string> currRes;
-        vector<vector<int>> grid(n, vector<int>(n, 0));
-        backtrack(0, currRes, res, grid, n);
+        grid = vector<vector<int>>(n, vector<int>(n, 0));
+        dfs(n, 0); 
+
         return res;
     }
 
-private:
-    bool check(int rowIdx, int colIdx, vector<vector<int>>& grid, int n) {
-        for (int i = 0; i < colIdx; ++i) {
-            if (grid[rowIdx][i] == 1) {
-                return false;
-            }
+    void dfs(int n, int idx){
+        if(idx == n){
+            res.push_back(v);
+            return;
         }
 
-        for (int i = rowIdx, j = colIdx; i >= 0 && j >= 0; --i, --j) {
-            if (grid[i][j] == 1) {
-                return false;
+        for(int i=0; i<n; i++){
+            if(canPut(i, idx, n)){
+                grid[i][idx] = 1;
+                v.push_back(getStr(n, i));
+                dfs(n, idx+1);
+                v.pop_back();
+                grid[i][idx] = 0;
             }
         }
+    }
 
-        for (int i = rowIdx, j = colIdx; i < n && j >= 0; ++i, --j) {
-            if (grid[i][j] == 1) {
+    bool canPut(int row, int col, int n){ // <sabya.sachi>
+        for(int i=0; i<col; i++){   //same row (left)
+            if(grid[row][i] == 1)
                 return false;
-            }
+        }
+
+        for(int i = row+1, j = col-1; i < n && j >=0; i++, j--) { //lower left dia
+            if(grid[i][j] == 1) return false; 
+        }
+
+        for(int i = row-1, j = col-1; i >= 0 && j >=0; i--, j--) { //upper left dia
+            if(grid[i][j] == 1) return false; 
         }
 
         return true;
     }
 
-    void backtrack(int colIdx, vector<string>& currRes, vector<vector<string>>& res, vector<vector<int>>& grid, int n) {
-        if (colIdx == n) {
-            res.push_back(currRes);
-            return;
-        }
-
-        for (int rowIdx = 0; rowIdx < n; ++rowIdx) {
-            if (check(rowIdx, colIdx, grid, n)) {
-                grid[rowIdx][colIdx] = 1;
-                currRes.push_back(getQueenRow(n, rowIdx));
-                backtrack(colIdx + 1, currRes, res, grid, n);
-                currRes.pop_back();
-                grid[rowIdx][colIdx] = 0;
-            }
-        }
-    }
-
-    string getQueenRow(int n, int val) {
-        string row(n, '.');
-        row[val] = 'Q';
-        return row;
+    string getStr(int n, int col){
+        string s(n, '.');
+        s[col] = 'Q';
+        return s;
     }
 };
